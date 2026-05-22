@@ -12,7 +12,7 @@ A single Go service that handles two things: rate-limited request ingestion and 
 go run cmd/server/main.go
 ```
 
-The server starts on `:8080`. You'll see a confirmation in the terminal once it's listening.
+The server starts on `:8080`. There will be a confirmation in the terminal once it's listening.
 
 Open a second terminal window to run the commands below while keeping the server running.
 
@@ -59,7 +59,7 @@ Response shape:
 
 ### Rate Limiting Approach
 
-Uses a **rolling window** (not a fixed window). Each accepted request stores an exact timestamp. On every new request, the system counts how many timestamps fall within the last 60 seconds from right now. This avoids the burst problem you get with fixed windows (where a user can fire 5 requests at 11:59 and another 5 at 12:00 and stay "within limits").
+Uses a **rolling window** (not a fixed window). Each accepted request stores an exact timestamp. On every new request, the system counts how many timestamps fall within the last 60 seconds from right now. This avoids the burst problem faced with fixed windows (where a user can fire 5 requests at 11:59 and another 5 at 12:00 and stay "within limits").
 
 Every window evaluation is wrapped in a `sync.Mutex` to prevent race conditions — parallel requests for the same `user_id` cannot both read a count of 4 and both get approved, pushing the user to 6.
 
@@ -183,11 +183,11 @@ source-asia-backend/
 
 ## Production Limitations
 
-**This is a single-instance, in-memory service.** That's fine for the assignment, but here's what would need to change in production:
+**This is a single-instance, in-memory service.** Here are some changes to consider in  production:
 
 **State is lost on restart.** Everything lives in RAM. A crash or deploy wipes all products and rate-limit history.
 
-**Can't scale horizontally.** If you run two instances behind a load balancer, each has its own state. A user could hit instance A four times and instance B four times and bypass the rate limit entirely. Rate-limit data needs to live somewhere shared.
+**Can't scale horizontally.** On running two instances behind a load balancer, each has its own state. A user could hit instance A four times and instance B four times and bypass the rate limit entirely. Rate-limit data needs to live somewhere shared.
 
 **Mutex contention under heavy load.** A global lock works fine at low traffic. At scale, it becomes a bottleneck as every concurrent request queues up to acquire it. Approaches to fix this include lock striping (split the map into N buckets, each with its own lock), atomic counters, or offloading state to a dedicated store.
 
