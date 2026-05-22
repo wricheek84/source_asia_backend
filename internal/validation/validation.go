@@ -8,7 +8,7 @@ import (
 	"github.com/wricheek84/source_asia_backend/internal/model"
 )
 
-// ValidateProduct checks constraints for creating a product.
+
 func ValidateProduct(input model.CreateProductInput) error {
 	if strings.TrimSpace(input.Name) == "" {
 		return errors.New("product name cannot be empty")
@@ -35,7 +35,7 @@ func ValidateProduct(input model.CreateProductInput) error {
 	return nil
 }
 
-// ValidateMedia checks constraints for adding media.
+
 func ValidateMedia(input model.AddMediaInput) error {
 	if len(input.ImageURLs) == 0 && len(input.VideoURLs) == 0 {
 		return errors.New("at least one image or video url must be provided")
@@ -56,7 +56,7 @@ func ValidateMedia(input model.AddMediaInput) error {
 	return nil
 }
 
-// IsValidURL verifies if a string is a properly formatted web link.
+
 func IsValidURL(toCheck string) bool {
 	u, err := url.ParseRequestURI(toCheck)
 	if err != nil {
